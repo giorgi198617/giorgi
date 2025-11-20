@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang='ka'><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ჩემი ონლაინ მაღაზია</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            padding-bottom: 80px;
+            text-align: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            color: white;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .product-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .product-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            transition: transform 0.3s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            background-color: #ddd;
+            margin-bottom: 15px;
+        }
+
+        h3 { margin: 5px 0; color: #333; }
+        .description { font-size: 14px; color: #666; margin: 10px 0; line-height: 1.4; min-height: 40px;}
+        .price { font-size: 20px; font-weight: bold; color: #e74c3c; margin: 10px 0; }
+
+        .whatsapp-btn {
+            display: inline-block;
+            background-color: #25D366;
+            color: white;
+            padding: 12px 20px;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            margin-top: auto;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: background 0.3s;
+        }
+        .whatsapp-btn:hover { background-color: #128C7E; }
+
+        #admin-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #333;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            gap: 20px;
+            box-shadow: 0 -5px 10px rgba(0,0,0,0.3);
+        }
+
+        .admin-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .btn-edit { background-color: #f39c12; color: white; }
+        .btn-save { background-color: #27ae60; color: white; display: none; }
+        
+        .editable-active {
+            border: 2px dashed #f39c12;
+            background-color: #fff8e1;
+            cursor: text;
+        }
+        
+        .image-editable {
+            border: 4px dashed #e74c3c !important;
+            cursor: pointer;
+            opacity: 0.8;
+        }
+
+        .secret-login {
+            margin-top: 50px;
+            color: rgba(255,255,255, 0.3);
+            font-size: 12px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>ონლაინ გამოწერა</h1>
+
+    <input type="file" id="image-upload-input" accept="image/png, image/jpeg, image/jpg" style="display: none;">
+
+    <div class="product-container" id="products-area">
+        
+        <div class="product-card">
+            <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxAQEA4PDw8PEBAQFBANDw8QDxQPDw0PFhEWFhYUFRQYHCggGBolHBUVIjEhJSkrLi4uFx8zODMsNygtLiwBCgoKDA0OFAwPFCsZFBksNzcsKyssLCssNyssKysrKysrNysrNyssKysrKysrKysrKywrKysrKysrKysrKysrK//AABEIALcBEwMBIgACEQEDEQH/xAAcAAEAAQUBAQAAAAAAAAAAAAAAAQIDBQYHBAj/xABAEAACAQICBggCBgkEAwAAAAAAAQIDEQQhBRIxQVFxBgcTMmGBobEikSM0UmJywRQVJDNCgrLR8JKis+EIJWP/xAAWAQEBAQAAAAAAAAAAAAAAAAAAAQL/xAAWEQEBAQAAAAAAAAAAAAAAAAAAARH/2gAMAwEAAhEDEQA/AO2AAoAkEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABQAAEEgEAAAAAAAAAA0/pT0+o4KpOioOrUppOaUtWMZNJqOx55r5gbgDRNH9ZuGlFdtCUJb9T4or5mZwvTfR9TZX1fxRa9i4NiBpnSXrCw+FlCnStXnJKcmpWhCL2c34GPwnWlTk7VMPZfahWT+aaQwdDBq2G6e4KeT7SPlGS/2yb9DMUdO4WUVNV4Ri3q3qXpZ8p2IMiDzVsfShHWdSFt1pKTfJI1XSnSftG4U5qnDnacs7ZvdyRcGzVdLUIScZVYprbtaXnsPZFppNZp5rxRzWtaTitbuvWaT4q2aW7MyeP6ST7NQ1lBJKLUL60lbi9hcG8J32Zg5XgsXOVam4zcLSg9WMrOzlvOqksEAkEEAkAQAAAAAAAAAAAAAAAAAAAAAAACT520xiJwx2OnVhruWIrqz4dpK3pb5I+iDU+k/QShjJdrCTo1tbXlJLWhUys9aPF8UywcbeKovvUnHkKjwjhOSc4ySbiuMrHRMZ1Wys+zxNN/jpuHqmzCYjq0xsX3KVRfcqLZ/NYqtXwmHhWpxqVJfG9q5O35FyeiF/DNPwRjcRhqkZVIwV9WU4aqnHWTUmu7e+487xOIhthUW7YwMmtEV5PVp/E77FvsbRofQlSjHtsbiFl3aWvqwv9+b28l6mr4PpFiMPlGVOz3ShHN7bayzfK5pumdPVsVUU69SVR3+FbIU1whFZL38WB3BzpVv3crtZXpz1lFfysmGFvd684tbtiSXNWNL6O6TwOFX1aaqNas8RKcakmsnZuy1Y3SySLGmulNetCU6KcKMXqa+zN8Fu5viijZtIaep4VyjGUZyyvkk0vGxhq3SFVG3rQV8/4k1yve/+bDX9HY2l2M41VrSrVFeW2SUVtu/FnrWi6MratTJ2zllu4fIgyehK7pVu1WLg7y15U6us4yllZpxhlay9eZ1mn07w2onNPtNkqdOcJeac3E4h+rEs41F4FM9HzWyXqDHf8P0uwM2oquk3ZJSTW3kZ0+c40XShKcG5yoypwctva1pLWkl92MU/8ZteC608RTjGE6MZKKUbtNOy5MmI7CDmuF62qT/eUGuU7fkzI0etDBSlGLhNJ7ZXVly4+gwbyDyaM0lRxNNVaE1OF3G6ytJbU1uZ6yAAAIBIAgEgCASAIAAAAAAAAAAAAACmtJqMmtqTa52yKimp3Zcn7AfM2kdDy1pSd9a713vUt9/Mx86dSF4xnGTeTi68Yy5ajkjdOlEWqkpRbjLit/NGq4lxnlVpwlwlFWfmjSsL0i/dw/Gv6ZGvN5m14zR06kWo2qfxR+JKSfJGHqaErrvUpx5xaRBkND1pToycm5NOVnJ3dtVby9o/SrpqCd50pynGrTb+GcWkr24+PlvPLo+EqcNSS2tt+F8i+6dLVpw7KcnGUm5wqW1k7ZWaa3bfEoq03gOzVKVKetSk5Om72aTzV7+a45MjC068knF3t9mcW/kncyGEjTlCdFqtqSzSn2bUJ7mnrJ7lfLhwLMej833YSl4xi37AF+kR70Z+aaK6GPqayT+TJ/VmIpq/aSpr71Rw9G0ejB1J3faSdbK0b91S3Nu13YC7htIVaOcX3nK6extu79i7U0zN96nB+SPbgtD068dSc5wSs1KNta/hfI3DA9U0KtGFSOOqxcle06MZpZ23NAaFSx9F9+h8meWviY6lRwh8cYScPCVsvk7HQa/VHiY508VQn+OM6b9LmNn1Z6Ql2lLs4xTjKn2iqQ1c1lJXabV7PcBmv/HaFRYHGa2tq/pPwXvZtUo61vOx1cwHQTo5+rcDRwmv2ko606k90qk5Nu3gsl5GfMoAAAAAAAAAACAAAAAAAAACAJBAAm5E9j5P2AYHAOmUpqvTink9dJbb1MtW6urpLXb5Grdtrat1Ztyi0s0nF2flkbl0xot1HOOU6evDVk7RTk1e6tt+HLzNNr0nGUWo3SUr2avrSabfv8zSpvmXYVZLZKS5Sa9jzJWyu8m/5lfhxCyXJtW8b5e4Hpdef25+cmyqGKmv4mea/Pxd/YmP/W3fYDI09KV1kqtRcpOPsJ4upPvVKkvxTlL3Z4k9njt/MvoBq+BcpopsV01mBntC95Lkdu0HG2GoL7v5s4toFfEm8krHb9H09WlSjwjHbuyuKV6ACDKJBAAkEACQQSAAAAAAUgAAAwABAKFwQAJBAuBIuU3AGk9YPROnXpzxVOTpVor4rd2puz4PZxTts3nGsZhK0G1KKl4rJ88rp+h9E9JPqtfkv6kcS0ptZVjWXfhNcld7PC5bm1scktneWe3bmZCo/PnmWp5J2A8qzt3WkrZX/wA2Fym5Rtq2bzurbfDNcimnJSSbjH5EqMfsL5L+wF6CtnZ8Xk7FUaq4r5oinFblYvKLApdXgn/pa9XkVU9d3dlFLNylnbmll6l2nEvYpfRVOTA3nqpwNDEzrVJa1T9H7O2srRcpNvZwWrwV/E6wct6i4/R6Qf8A9KS9JnUSVEggEEggASCCQAAAAAAAAIAAAgkgoAEACCSABFwQBIIJAx/SH6rX/D+aOI6V2vzO36e+rV/w/mjiGldsirGFqItz2F2oWrbQPPRj8KLsYlGHXwryLqQFyCLqLcS6gLlNleNf0M+RbiirHP6KQHRuo2P7PjXxqwXyg/7nTDnHUdH9jxT411/xo6ORAAAAAAAAAAASCAQSCAAAAAgkAQCSCiCCogCCCQBAAA8Gnvq1f8DOJaUXxSO46XpOdCtBbXCVvkcP0o/ilzZYrCVC0X6haaA8+H7q5L2LyRZw6+GPJeyL6QFcS4i3ErTAuRY0g/o35e5EWMf+6817gdS6kY/sNd8a8vSEToZz/qTX/r6j415/0QOgEQAAAAAAAAAAAAAAAQAAAAAAAAQCQBSCogopIKrEMCmUbpp78jh/SfBSoVqlKas4t2e6S3Nc1Y7jcwHSzo7DG08rRrRXwTexr7MvD2A4RUKdxldMaGq0JuFSEoS4SVrrinsa8UYyVNr0KrzYfux5L2RcKKHdXKPsisCtFaIhH/N5cjBvcBMBj4vs/Ne56sPhL5yailm28kj06J0TU0liI4bDJ9lFp1q9vgpx3yb48FvA6R1M0nHRt2rKVarJeKSivdM3o8mitH08NRpYeitWnSioRW1vi297bu3zPWRAAAAAAAAAEgCCQCCASQAAAAAAAAAAAAAFEENFRAFqRZnJnqaLcqdwMTpGjCrFwqQhUj9mcVJepzvpL0apRjOVGEovaoqTlHbwefqdSqYW55qmi1LbYo+dcTWjh5atSLz2LY/XwsUR0tS+zL/b/c7zjeh2Gq9+nF+SMWurTA3v2UP9KCuP09JxbUadKc5PYlt9Ezf+i3RrtYQqYilNSefZqfwpbrtLabzgOiOGo9ynFckjNUcJGOSVgjG4DQ9CMOz/AEajqbXF04yTfjfaZfC0IU46tOEIR+zCKjH5IqjArSIKiSEiQABIAAEAAAACCiQQAAAIAAKAAAAAAAAAAAEEgCCCQBTYWKiAKbCxUAKbE2JFgBKAAkAAAAAAAAAAAAAAAAAAAAQAAUAAAAAAAAAAAIJAEAAAAAAAAEgAAAAAAAAAAAAAAAAAAAB//9k=" alt="ნივთი" class="product-image">
+            <h3 class="editable" contenteditable="false">გაზის ფილტრი lovato</h3>
+            <p class="description editable" contenteditable="false">არის უმაღლესი ხარისხის ფილტრი .</p>
+            <p class="price editable" contenteditable="false">20</p>
+            <a href="#" class="whatsapp-btn" onclick="buyItem(this)">ყიდვა WhatsApp-ით</a>
+        </div>
+
+        <div class="product-card">
+            <img src="https://via.placeholder.com/300?text=სურათი+2" alt="ნივთი" class="product-image">
+            <h3 class="editable" contenteditable="false">ნივთის სახელი 2</h3>
+            <p class="description editable" contenteditable="false">აღწერა აქ...</p>
+            <p class="price editable" contenteditable="false">65.00</p>
+            <a href="#" class="whatsapp-btn" onclick="buyItem(this)">ყიდვა WhatsApp-ით</a>
+        </div>
+
+        <div class="product-card">
+            <img src="https://via.placeholder.com/300?text=სურათი+3" alt="ნივთი" class="product-image">
+            <h3 class="editable" contenteditable="false">ნივთის სახელი 3</h3>
+            <p class="description editable" contenteditable="false">აღწერა აქ...</p>
+            <p class="price editable" contenteditable="false">30.00</p>
+            <a href="#" class="whatsapp-btn" onclick="buyItem(this)">ყიდვა WhatsApp-ით</a>
+        </div>
+
+        <div class="product-card">
+            <img src="https://via.placeholder.com/300?text=სურათი+4" alt="ნივთი" class="product-image">
+            <h3 class="editable" contenteditable="false">ნივთის სახელი 4</h3>
+            <p class="description editable" contenteditable="false">აღწერა აქ...</p>
+            <p class="price editable" contenteditable="false">120.00</p>
+            <a href="#" class="whatsapp-btn" onclick="buyItem(this)">ყიდვა WhatsApp-ით</a>
+        </div>
+
+        <div class="product-card">
+            <img src="https://via.placeholder.com/300?text=სურათი+5" alt="ნივთი" class="product-image">
+            <h3 class="editable" contenteditable="false">ნივთის სახელი 5</h3>
+            <p class="description editable" contenteditable="false">აღწერა აქ...</p>
+            <p class="price editable" contenteditable="false">15.00</p>
+            <a href="#" class="whatsapp-btn" onclick="buyItem(this)">ყიდვა WhatsApp-ით</a>
+        </div>
+
+        <div class="product-card">
+            <img src="https://via.placeholder.com/300?text=სურათი+6" alt="ნივთი" class="product-image">
+            <h3 class="editable" contenteditable="false">ნივთის სახელი 6</h3>
+            <p class="description editable" contenteditable="false">აღწერა აქ...</p>
+            <p class="price editable" contenteditable="false">85.00</p>
+            <a href="#" class="whatsapp-btn" onclick="buyItem(this)">ყიდვა WhatsApp-ით</a>
+        </div>
+
+        <div class="product-card">
+            <img src="https://via.placeholder.com/300?text=სურათი+7" alt="ნივთი" class="product-image">
+            <h3 class="editable" contenteditable="false">ნივთის სახელი 7</h3>
+            <p class="description editable" contenteditable="false">აღწერა აქ...</p>
+            <p class="price editable" contenteditable="false">200.00</p>
+            <a href="#" class="whatsapp-btn" onclick="buyItem(this)">ყიდვა WhatsApp-ით</a>
+        </div>
+
+        <div class="product-card">
+            <img src="https://via.placeholder.com/300?text=სურათი+8" alt="ნივთი" class="product-image">
+            <h3 class="editable" contenteditable="false">ნივთის სახელი 8</h3>
+            <p class="description editable" contenteditable="false">აღწერა აქ...</p>
+            <p class="price editable" contenteditable="false">45.00</p>
+            <a href="#" class="whatsapp-btn" onclick="buyItem(this)">ყიდვა WhatsApp-ით</a>
+        </div>
+
+        <div class="product-card">
+            <img src="https://via.placeholder.com/300?text=სურათი+9" alt="ნივთი" class="product-image">
+            <h3 class="editable" contenteditable="false">ნივთის სახელი 9</h3>
+            <p class="description editable" contenteditable="false">აღწერა აქ...</p>
+            <p class="price editable" contenteditable="false">95.00</p>
+            <a href="#" class="whatsapp-btn" onclick="buyItem(this)">ყიდვა WhatsApp-ით</a>
+        </div>
+
+        <div class="product-card">
+            <img src="https://via.placeholder.com/300?text=სურათი+10" alt="ნივთი" class="product-image">
+            <h3 class="editable" contenteditable="false">ნივთის სახელი 10</h3>
+            <p class="description editable" contenteditable="false">აღწერა აქ...</p>
+            <p class="price editable" contenteditable="false">60.00</p>
+            <a href="#" class="whatsapp-btn" onclick="buyItem(this)">ყიდვა WhatsApp-ით</a>
+        </div>
+
+    </div>
+
+    <div style="margin-top: 40px;">
+        <span class="secret-login" onclick="requestAdminAccess()">Admin Login</span>
+    </div>
+
+    <div id="admin-panel" style="display: none;">
+        <button class="admin-btn btn-edit" onclick="enableEditing()" style="display: inline-block;">🔧 რედაქტირება</button>
+        <button class="admin-btn btn-save" onclick="saveAndDownload()" style="display: none;">💾 შენახვა და გადმოწერა</button>
+        <button class="admin-btn" style="background: #c0392b;" onclick="location.reload()">❌ გასვლა</button>
+    </div>
+
+    <script>
+        let isEditing = false;
+        let currentImageElement = null;
+
+        // პაროლის მოთხოვნა
+        function requestAdminAccess() {
+            let password = prompt("შეიყვანეთ ადმინისტრატორის პაროლი:");
+            if(password === "1234") {
+                document.getElementById('admin-panel').style.display = 'flex';
+            } else {
+                alert("პაროლი არასწორია!");
+            }
+        }
+
+        // ფაილის ატვირთვის დამუშავება
+        const fileInput = document.getElementById('image-upload-input');
+        
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file && currentImageElement) {
+                const reader = new FileReader();
+                
+                reader.onload = function(readerEvent) {
+                    // სურათის ჩასმა Base64 ფორმატში
+                    currentImageElement.src = readerEvent.target.result;
+                }
+                
+                reader.readAsDataURL(file);
+            }
+            // ინპუტის გასუფთავება, რომ იგივე ფაილის არჩევა ხელახლა შეიძლებოდეს
+            fileInput.value = '';
+        });
+
+        function enableEditing() {
+            isEditing = true;
+            document.querySelector('.btn-edit').style.display = 'none';
+            document.querySelector('.btn-save').style.display = 'inline-block';
+            
+            alert("რედაქტირება ჩართულია!\n\n1. დააწკაპუნეთ სურათზე, რომ ატვირთოთ ახალი ფოტო.\n2. დააწკაპუნეთ ტექსტზე შესაცვლელად.\n3. ბოლოს დააჭირეთ 'შენახვა და გადმოწერას'.");
+
+            // ტექსტების რედაქტირება
+            const texts = document.querySelectorAll('.editable');
+            texts.forEach(el => {
+                el.contentEditable = "true";
+                el.classList.add('editable-active');
+            });
+
+            // სურათების რედაქტირება
+            const images = document.querySelectorAll('.product-image');
+            images.forEach(img => {
+                img.classList.add('image-editable');
+                img.onclick = function() {
+                    if(isEditing) {
+                        currentImageElement = img;
+                        fileInput.click(); // ფაილის არჩევის ფანჯრის გახსნა
+                    }
+                }
+            });
+        }
+
+        function saveAndDownload() {
+            // რედაქტირების გამორთვა
+            const texts = document.querySelectorAll('.editable');
+            texts.forEach(el => {
+                el.contentEditable = "false";
+                el.classList.remove('editable-active');
+            });
+
+            const images = document.querySelectorAll('.product-image');
+            images.forEach(img => {
+                img.onclick = null;
+                img.classList.remove('image-editable');
+            });
+
+            isEditing = false;
+            document.querySelector('.btn-edit').style.display = 'inline-block';
+            document.querySelector('.btn-save').style.display = 'none';
+
+            document.getElementById('admin-panel').style.display = 'none';
+
+            // HTML-ის გენერირება
+            const htmlContent = "<!DOCTYPE html>\n<html lang='ka'>" + document.documentElement.innerHTML + "</html>";
+            
+            // ფაილის გადმოწერა
+            const blob = new Blob([htmlContent], { type: "text/html" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "index.html";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            alert("ცვლილებები (და სურათები) შენახულია! \nგადმოწერილი ფაილი გამოიყენეთ ძველის ნაცვლად.");
+            
+            document.getElementById('admin-panel').style.display = 'flex';
+        }
+
+        function buyItem(btn) {
+            if (isEditing) return;
+
+            const card = btn.parentElement;
+            const name = card.querySelector('h3').innerText;
+            const price = card.querySelector('.price').innerText;
+            const phone = "995500700271";
+            
+            const text = `გამარჯობა, მსურს შევიძინო: ${name}. ფასი: ${price} ლარი.`;
+            const url = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
+            
+            window.open(url, '_blank');
+        }
+    </script>
+
+</body></html>
